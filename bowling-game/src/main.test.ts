@@ -21,3 +21,33 @@ describe("Game initialization suite", () => {
         expect(areEveryRollsSecond).toBeTruthy();
     });
 });
+
+describe("Game score suite", () => {
+    let game: Game;
+    beforeEach(() => {
+        game = new Game();
+        game.init();
+    });
+    test("모든 타구가 0점이라면, 최종 점수는 0점이다.", () => {
+        //given
+        //when
+        const score = game.score();
+        //then
+        expect(score).toBe(0);
+    });
+
+    test("모든 타구가 1점이라면, 최종 점수는 20점이다.", () => {
+        // given
+        const pin = 1;
+
+        //when
+        for (let i = 0; i < 20; i++) {
+            game.roll(pin);
+        }
+
+        const score = game.score();
+
+        //then
+        expect(score).toBe(20);
+    });
+});
