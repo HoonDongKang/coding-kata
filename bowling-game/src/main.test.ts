@@ -73,4 +73,53 @@ describe("Game score suite", () => {
         //then
         expect(score).toBe(300);
     });
+    test("첫 프레임 스페어, 다음 프레임 첫 투구 4점이면 총합 계산", () => {
+        // given
+        // 1프레임: 7 + 3 (스페어)
+        game.roll(7);
+        game.roll(3);
+
+        // 2프레임: 4 + 2
+        game.roll(4);
+        game.roll(2);
+
+        // 나머지 8프레임은 0점
+        for (let i = 0; i < 16; i++) {
+            game.roll(0);
+        }
+
+        // when
+        const score = game.score();
+
+        // then
+        // 1프레임: 7+3+4 = 14, 2프레임: 4+2=6, 나머지: 0
+        expect(score).toBe(20);
+    });
+
+    test("연속 스페어 처리", () => {
+        // 1프레임: 5 + 5 (스페어)
+        game.roll(5);
+        game.roll(5);
+
+        // 2프레임: 6 + 4 (스페어)
+        game.roll(6);
+        game.roll(4);
+
+        // 3프레임: 3 + 2
+        game.roll(3);
+        game.roll(2);
+
+        // 나머지: 0점
+        for (let i = 0; i < 14; i++) game.roll(0);
+
+        // when
+        const score = game.score();
+
+        // then
+        // 1프레임: 10 + 6 = 16
+        // 2프레임: 10 + 3 = 13
+        // 3프레임: 3 + 2 = 5
+        // 총합 = 16 + 13 + 5 = 34
+        expect(score).toBe(34);
+    });
 });
