@@ -14,11 +14,20 @@ describe("Game initialization suite", () => {
         expect(frames).toHaveLength(10);
     });
 
-    test("하나의 프레임에는 두 번의 투구가 가능하다.", () => {
+    test("1에서 9 프레임에는 두 번의 투구가 가능하다. ", () => {
         const frames = game.frames;
-        const areEveryRollsSecond = frames.every((frame) => frame.rolls.length === 2);
+        const firstToNinethRolls = frames.slice(0, 8);
+        const areEveryRollsSecond = firstToNinethRolls.every((frame) => frame.rolls.length === 2);
 
         expect(areEveryRollsSecond).toBeTruthy();
+    });
+
+    test("10 프레임에는 세 번의 투구가 가능하다. ", () => {
+        const frames = game.frames;
+        const lastRoll = frames.pop();
+        const isLastRollThird = lastRoll.rolls.length === 3;
+
+        expect(isLastRollThird).toBeTruthy();
     });
 });
 
