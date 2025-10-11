@@ -1,25 +1,45 @@
 export class Frame {
     rolls: number[];
     currentRoll: number;
+    frameScore: number;
 
     constructor() {
         this.rolls = [null, null];
         this.currentRoll = 0;
+        this.frameScore = null;
+    }
+
+    isComplete() {
+        return this.isStrike() || this.rolls.every((roll) => roll !== null);
+    }
+
+    isStrike() {
+        return this.rolls[0] === 10;
     }
 
     roll(pins: number) {
         this.rolls[this.currentRoll] = pins;
 
-        this.updateCurrentroll();
+        this.updateCurrentRoll();
     }
 
-    updateCurrentroll() {
-        const idx = this.currentRoll;
-        this.currentRoll = idx < 1 ? idx + 1 : 0;
+    updateCurrentRoll() {
+        if (!this.isStrike() && this.currentRoll < 1) {
+            this.currentRoll++;
+        }
     }
 
-    score() {
-        return this.rolls.reduce((acc, cur) => (acc += cur), 0);
+    getFrameScore(): number {
+        if (this.frameScore === null) this.setFrameScore(null);
+        return this.frameScore;
+    }
+
+    setFrameScore(score: number | null) {
+        if (score === null) {
+            this.frameScore = this.rolls.reduce((acc, cur) => acc + (cur ?? 0), 0);
+        } else {
+            this.frameScore = score;
+        }
     }
 }
 
@@ -40,26 +60,53 @@ export class Game {
         return !this.frames.some((frame) => frame.rolls.some((roll) => roll === null));
     }
 
-    updateCurrentFrame() {
+    isStrike(pins: number) {
+        return pins === 10;
+    }
+
+    isNextFrame(rolls: number[]) {
+        return rolls.every((roll) => roll !== null);
+    }
+
+    updateCurrentFrame(pins: number) {
         const frame = this.frames[this.currentFrame];
         const rolls = frame.rolls;
 
-        if (rolls.every((roll) => roll !== null)) {
+        if (this.isStrike(pins) || this.isNextFrame(rolls)) {
             this.currentFrame++;
         }
     }
 
     roll(pins: number): void {
-        if (this.isFinish()) {
-            console.error("이미 모든 타구를 던지셨습니다");
-        }
-
-        this.updateCurrentFrame();
-
         const frame = this.frames[this.currentFrame];
         frame.roll(pins);
+
+        if (frame.isStrike() || frame.rolls.every((roll) => roll !== null)) {
+            this.currentFrame++;
+        }
     }
     score(): number {
-        return this.frames.reduce((acc, cur) => (acc += cur.score()), 0);
+        const totalScore = this.frames.reduce((acc, frame, i) => {
+            let frameScore = frame.getFrameScore();
+
+            if (this.isStrike(frame.rolls[0])) {
+                const nextFrame = this.frames[i + 1];
+
+                if (!nextFrame) {
+                    acc += frameScore;
+                    return acc;
+                }
+                const nextFrameScore = nextFrame.getFrameScore();
+
+                frameScore += nextFrameScore;
+                frame.setFrameScore(frameScore);
+            }
+
+            acc += frameScore;
+            console.log(frame);
+            return acc;
+        }, 0);
+
+        return totalScore;
     }
 }

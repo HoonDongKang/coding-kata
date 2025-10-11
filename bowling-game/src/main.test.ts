@@ -50,4 +50,18 @@ describe("Game score suite", () => {
         //then
         expect(score).toBe(20);
     });
+
+    test("모든 타구를 스트라이크로 할 경우, 300점이다.", () => {
+        // given
+        const pin = 10;
+
+        //when
+        for (let i = 0; i < 12; i++) {
+            game.roll(pin);
+        }
+        const score = game.score();
+
+        //then
+        expect(score).toBe(300);
+    });
 });
